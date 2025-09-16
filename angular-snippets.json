@@ -1,0 +1,30 @@
+{
+  "Angular Standalone Component": {
+    "prefix": "a-component",
+    "body": [
+      "import { Component } from '@angular/core';",
+      "",
+      "@Component({",
+      "  selector: '${1:app-root}',",
+      "  imports: [],",
+      "  template: ``",
+      "})",
+      "export class ${2:Component} {}",
+      "$0"
+    ],
+    "description": "Creates an Angular standalone component"
+  },
+	"Angular Service": {
+		"prefix": "a-service",
+		"body": [
+			"import { Injectable } from '@angular/core';",
+			"",
+			"@Injectable({",
+			"  providedIn: 'root'",
+			"})",
+			"export class ${1:Data}Service {}",
+			""
+		],
+		"description": "Creates a root-provided Angular service"
+	}
+}
