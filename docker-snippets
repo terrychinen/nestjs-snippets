@@ -1,0 +1,56 @@
+{
+	"Docker Compose Postgres Service": {
+		"prefix": "dc-postgres",
+		"body": [
+			"version: '3.8'",
+			"",
+			"services:",
+			"  app_db",
+			"    container_name: app_database",
+			"    image: postgres:16.2",
+			"    restart: always",
+			"    volumes:",
+			"      - ./postgres:/var/lib/postgresql/data",
+			"    ports:",
+			"      - 5432:5432",
+			"    environment:",
+			"      - POSTGRES_USER=postgres",
+			"      - POSTGRES_PASSWORD=postgres",
+			"      - POSTGRES_DB=app_db"
+		],
+		"description": "Creates a Docker Compose service for PostgreSQL"
+	},
+
+  "Docker Compose MySQL 8": {
+    "prefix": "dc-mysql",
+    "body": [
+      "version: '3.8'",
+      "",
+      "services:",
+      "  mysql-db:",
+      "    image: mysql:8",
+      "    container_name: mysql-db",
+			"    restart: unless-stopped",
+      "    ports:",
+      "      - \"3306:3306\"",
+      "    environment:",
+			"      MYSQL_USER: ${DB_USERNAME}",
+      "      MYSQL_PASSWORD: ${DB_PASSWORD}",
+			"      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}",
+      "      MYSQL_DATABASE: ${DB_DATABASE}",
+      "    volumes:",
+      "      - mysql-data:/var/lib/mysql",
+      "",
+      "volumes:",
+      "  mysql-data:"
+    ],
+    "description": "Genera una configuración de Docker Compose para un servicio de MySQL 8."
+	},
+
+	"Environment config database postgres": {
+		"prefix": "env-postgres",
+		"body": [
+			"DATABASE_URL='postgresql://user:password@localhost:5432/db_name?schema=public'"
+		],
+	}
+}
