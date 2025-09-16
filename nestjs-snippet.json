@@ -1,0 +1,333 @@
+{
+  "Controller": {
+    "prefix": "nctrl",
+    "body": [
+      "import { Controller } from '@nestjs/common';",
+      "",
+      "@Controller('${1:controller}')",
+      "export class ${2:}Controller {",
+      "  constructor() {}",
+      "}",
+      ""
+    ],
+    "description": "Creates a NestJS controller"
+  },
+
+  "Service": {
+    "prefix": "nsvc",
+    "body": [
+      "import { Injectable } from '@nestjs/common';",
+      "",
+      "@Injectable()",
+      "export class ${2:}Service {}",
+      ""
+    ],
+    "description": "Creates a NestJS service"
+  },
+
+  "Module": {
+    "prefix": "nmodule",
+    "body": [
+      "import { Module } from '@nestjs/common';",
+      "",
+      "@Module({})",
+      "export class ${1:Name}Module {}"
+    ],
+    "description": "Creates a NestJS module"
+  },
+
+  "Global ValidationPipe": {
+    "prefix": "n-validationpipe",
+    "body": [
+      "app.useGlobalPipes(",
+      "  new ValidationPipe({",
+      "    whitelist: true,",
+      "    forbidNonWhitelisted: true,",
+      "  }),",
+      ");"
+    ],
+    "description": "Adds NestJS Global ValidationPipe with whitelist and forbidNonWhitelisted options"
+  },
+
+  "TypeORM Database Module": {
+    "prefix": "n-db",
+    "body": [
+      "import { Module } from '@nestjs/common';",
+      "import { ConfigModule, ConfigService } from '@nestjs/config';",
+      "import { TypeOrmModule } from '@nestjs/typeorm';",
+      "",
+      "@Module({",
+      "  imports: [",
+      "    TypeOrmModule.forRootAsync({",
+      "      imports: [ConfigModule],",
+      "      inject: [ConfigService],",
+      "      useFactory: (configService: ConfigService) => ({",
+      "        type: ${1|'mysql','postgres','mariadb','sqlite','mssql'|},",
+      "        host: configService.get('DB_HOST'),",
+      "        port: +configService.get('DB_PORT'),",
+      "        username: configService.get('DB_USERNAME'),",
+      "        password: configService.get('DB_PASSWORD'),",
+      "        database: configService.get('DB_NAME'),",
+      "        autoLoadEntities: true,",
+      "        synchronize: configService.get('NODE_ENV') !== 'production',",
+      "      }),",
+      "    }),",
+      "  ],",
+      "  exports: [TypeOrmModule],",
+      "})",
+      "export class DatabaseModule {}",
+      ""
+    ],
+    "description": "Add @nestjs/typeorm typeorm @nestjs/config"
+  },
+
+"Mongoose Database Module": {
+    "prefix": "n-mongo",
+    "body": [
+      "import { Module } from '@nestjs/common';",
+      "import { ConfigModule, ConfigService } from '@nestjs/config';",
+      "import { MongooseModule } from '@nestjs/mongoose';",
+      "",
+      "@Module({",
+      "  imports: [",
+      "    MongooseModule.forRootAsync({",
+      "      imports: [ConfigModule],",
+      "      inject: [ConfigService],",
+      "      useFactory: (configService: ConfigService) => ({",
+      "        uri: configService.get('MONGO_URI'),",
+      "      }),",
+      "    }),",
+      "  ],",
+      "  exports: [MongooseModule],",
+      "})",
+      "export class ${1:DatabaseModule} {}",
+      ""
+    ],
+    "description": "Add @nestjs/mongoose mongoose @nestjs/config"
+  },
+
+  "Zod Environment Schema": {
+    "prefix": "n-zod",
+    "body": [
+      "import { z } from 'zod';",
+      "",
+      "export const ${1:envsSchema} = z.object({",
+      "  NODE_ENV: z.string().default('development'),",
+      "  DB_HOST: z.string(),",
+      "  DB_PORT: z.coerce.number().int().positive().default(3306),",
+      "  DB_NAME: z.string(),",
+      "  DB_USERNAME: z.string(),",
+      "  DB_PASSWORD: z.string(),",
+      "  JWT_SECRET: z.string(),",
+      "  JWT_EXPIRES_IN: z.string(),",
+      "});",
+      "",
+      "export type ${2:Env} = z.infer<typeof ${1:envsSchema}>;",
+      ""
+    ],
+    "description": "Add zod"
+  },
+
+  "NestJS Zod ConfigModule": {
+    "prefix": "n-zod-config",
+    "body": [
+      "import { Module } from '@nestjs/common';",
+      "import { ConfigModule } from '@nestjs/config';",
+      "import { ${1:envsSchema} } from '${2:./envs.schema}';",
+      "",
+      "@Module({",
+      "  imports: [",
+      "    ConfigModule.forRoot({",
+      "      validate: (env) => ${1:envsSchema}.parse(env),",
+      "      isGlobal: true,",
+      "    }),",
+      "  ],",
+      "})",
+      "export class ${3:EnvsModule} {}",
+      ""
+    ],
+    "description": "Creates a global NestJS ConfigModule validated with a Zod schema."
+  },
+
+  "NestJS .env Template": {
+    "prefix": "n-env",
+    "body": [
+      "NODE_ENV=${1:develop}",
+      "",
+      "AUTH_MS_PORT=${2:3001}",
+      "",
+      "DB_HOST=${3:localhost}",
+      "DB_PORT=${4:3306}",
+      "DB_NAME=${5:nestjs_auth}",
+      "DB_USERNAME=${6:admin}",
+      "DB_PASSWORD=${7:admin}",
+      "DB_ROOT_PASSWORD=${8:admin}",
+      "",
+      "JWT_EXPIRES_IN=${9:1h}",
+      "JWT_SECRET=${10:jwt-example}",
+      "$0"
+    ],
+    "description": "Creates a template .env file for a NestJS application."
+  },
+
+  "NestJS JWT Strategy": {
+    "prefix": "n-jwt",
+    "body": [
+      "import { Injectable } from '@nestjs/common';",
+      "import { ConfigService } from '@nestjs/config';",
+      "import { PassportStrategy } from '@nestjs/passport';",
+      "",
+      "import { ExtractJwt, Strategy } from 'passport-jwt';",
+      "",
+      "import { ${2:Env} } from '${3:@configs/envs/envs.schema}';",
+      "import { ${4:User} } from '${5:@auth/entities/user.entity}';",
+      "",
+      "@Injectable()",
+      "export class ${1:JwtStrategy} extends PassportStrategy(Strategy) {",
+      "  constructor(configService: ConfigService<${2:Env}, true>) {",
+      "    super({",
+      "      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),",
+      "      ignoreExpiration: false,",
+      "      secretOrKey: configService.get('JWT_SECRET'),",
+      "    });",
+      "  }",
+      "",
+      "  validate(payload: ${4:User}) {",
+      "    return ${6:{ userId: payload.id, email: payload.email }};",
+      "  }",
+      "}",
+      ""
+    ],
+    "description": "Add @nestjs/jwt passport-jwt"
+  },
+
+  "NestJS JWT Module": {
+    "prefix": "n-jwt-module",
+    "body": [
+      "import { Module } from '@nestjs/common';",
+      "import { ConfigModule, ConfigService } from '@nestjs/config';",
+      "import { JwtModule } from '@nestjs/jwt';",
+      "import { PassportModule } from '@nestjs/passport';",
+      "import { ${2:JwtStrategy} } from '${3:./jwt.strategy}';",
+      "",
+      "@Module({",
+      "  imports: [",
+      "    PassportModule,",
+      "    JwtModule.registerAsync({",
+      "      imports: [ConfigModule],",
+      "      inject: [ConfigService],",
+      "      useFactory: (configService: ConfigService) => ({",
+      "        secret: configService.get<string>('JWT_SECRET'),",
+      "        signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES_IN') },",
+      "      }),",
+      "    }),",
+      "  ],",
+      "  providers: [${2:JwtStrategy}],",
+      "  exports: [PassportModule, JwtModule],",
+      "})",
+      "export class ${1:JwtStrategyModule} {}",
+      ""
+    ],
+    "description": "Creates a NestJS module for JWT authentication with Passport."
+  },
+
+  "Winston Custom Logger": {
+    "prefix": "n-winston-logger",
+    "body": [
+      "import { Injectable, ConsoleLogger } from '@nestjs/common';",
+      "import * as winston from 'winston';",
+      "",
+      "@Injectable()",
+      "export class CustomLogger extends ConsoleLogger {",
+      "  private readonly logger: winston.Logger;",
+      "",
+      "  constructor() {",
+      "    super();",
+      "",
+      "    this.logger = winston.createLogger({",
+      "      level: 'info',",
+      "",
+      "      format: winston.format.combine(",
+      "        winston.format.timestamp(),",
+      "        winston.format.colorize(),",
+      "        winston.format.printf(({ timestamp, level, message, context, trace }) => {",
+      "          return `${timestamp} [${context}] ${level}: ${message}${trace ? `\\n${trace}` : ''}`;",
+      "        }),",
+      "      ),",
+      "",
+      "      transports: [",
+      "        new winston.transports.Console(),",
+      "        new winston.transports.Http({ host: '${3:my-log-server.com}', port: ${4:3000} }),",
+      "      ],",
+      "    });",
+      "  }",
+      "",
+      "  log(message: string, context?: string): void {",
+      "    this.logger.info(message, { context });",
+      "  }",
+      "",
+      "  error(message: string, trace: string, context?: string): void {",
+      "    this.logger.error(message, { context, trace });",
+      "  }",
+      "",
+      "  warn(message: string, context?: string): void {",
+      "    this.logger.warn(message, { context });",
+      "  }",
+      "",
+      "  debug(message: string, context?: string): void {",
+      "    this.logger.debug(message, { context });",
+      "  }",
+      "}"
+    ],
+    "description": "Creates a custom NestJS logger using the Winston library"
+  },
+
+  "Pipe: ToLowerCasePipe": {
+    "prefix": "n-pipe",
+    "body": [
+      "import { ArgumentMetadata, Injectable, PipeTransform } from '@nestjs/common';",
+      "",
+      "@Injectable()",
+      "export class ${1:NamePipe} implements PipeTransform {",
+      "  transform(value: unknown, metadata: ArgumentMetadata) {",
+      "    return value;",
+      "  }",
+      "}"
+    ],
+    "description": "NestJS custom pipe"
+  },
+
+  "Opossum Circuit Breaker Provider": {
+    "prefix": "n-circuit-breaker",
+    "body": [
+      "import { FactoryProvider, Logger } from '@nestjs/common';",
+      "import * as CircuitBreaker from 'opossum';",
+      "",
+      "export const ${1:INVENTORY}_CIRCUIT_BREAKER = '${1}_CIRCUIT_BREAKER';",
+      "",
+      "export const ${1:/downcase}CircuitBreakerProvider: FactoryProvider<CircuitBreaker> = {",
+      "  provide: ${1}_CIRCUIT_BREAKER,",
+      "  useFactory: () => {",
+      "    const logger = new Logger('CircuitBreaker');",
+      "",
+      "    const options: CircuitBreaker.Options = {",
+      "      timeout: ${2:3000}, // If the action does not complete, it's a failure.",
+      "      errorThresholdPercentage: ${3:50}, // When 50% of requests fail, open the circuit.",
+      "      resetTimeout: ${4:30000}, // Time to wait before trying again (half-open state).",
+      "    };",
+      "",
+      "    const breaker = new CircuitBreaker(async (productId: string) => {",
+      "      Promise.resolve({ productId, stock: 100 })",
+      "    }, options);",
+      "",
+      "    breaker.on('open', () => logger.warn('Circuit has been opened.'));",
+      "    breaker.on('close', () => logger.log('Circuit has been closed.'));",
+      "    breaker.on('halfOpen', () => logger.warn('Circuit is half-open.'));",
+      "",
+      "    return breaker;",
+      "  },",
+      "};"
+    ],
+    "description": "Creates a NestJS FactoryProvider for an Opossum circuit breaker."
+  },
+}
