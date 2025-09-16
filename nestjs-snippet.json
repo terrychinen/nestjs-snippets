@@ -1,6 +1,6 @@
 {
   "Controller": {
-    "prefix": "nctrl",
+    "prefix": "n-ctrl",
     "body": [
       "import { Controller } from '@nestjs/common';",
       "",
@@ -14,7 +14,7 @@
   },
 
   "Service": {
-    "prefix": "nsvc",
+    "prefix": "n-svc",
     "body": [
       "import { Injectable } from '@nestjs/common';",
       "",
@@ -26,7 +26,7 @@
   },
 
   "Module": {
-    "prefix": "nmodule",
+    "prefix": "n-module",
     "body": [
       "import { Module } from '@nestjs/common';",
       "",
@@ -52,56 +52,34 @@
   "TypeORM Database Module": {
     "prefix": "n-db",
     "body": [
-      "import { Module } from '@nestjs/common';",
-      "import { ConfigModule, ConfigService } from '@nestjs/config';",
-      "import { TypeOrmModule } from '@nestjs/typeorm';",
-      "",
-      "@Module({",
-      "  imports: [",
-      "    TypeOrmModule.forRootAsync({",
-      "      imports: [ConfigModule],",
-      "      inject: [ConfigService],",
-      "      useFactory: (configService: ConfigService) => ({",
-      "        type: ${1|'mysql','postgres','mariadb','sqlite','mssql'|},",
-      "        host: configService.get('DB_HOST'),",
-      "        port: +configService.get('DB_PORT'),",
-      "        username: configService.get('DB_USERNAME'),",
-      "        password: configService.get('DB_PASSWORD'),",
-      "        database: configService.get('DB_NAME'),",
-      "        autoLoadEntities: true,",
-      "        synchronize: configService.get('NODE_ENV') !== 'production',",
-      "      }),",
-      "    }),",
-      "  ],",
-      "  exports: [TypeOrmModule],",
-      "})",
-      "export class DatabaseModule {}",
-      ""
+      "TypeOrmModule.forRootAsync({",
+      "  imports: [ConfigModule],",
+      "  inject: [ConfigService],",
+      "  useFactory: (configService: ConfigService) => ({",
+      "    type: ${1|'mysql','postgres','mariadb','sqlite','mssql'|},",
+      "    host: configService.get('DB_HOST'),",
+      "    port: +configService.get('DB_PORT'),",
+      "    username: configService.get('DB_USERNAME'),",
+      "    password: configService.get('DB_PASSWORD'),",
+      "    database: configService.get('DB_NAME'),",
+      "    autoLoadEntities: true,",
+      "    synchronize: configService.get('NODE_ENV') !== 'production',",
+      "  }),",
+      "}),",
     ],
     "description": "Add @nestjs/typeorm typeorm @nestjs/config"
   },
 
-"Mongoose Database Module": {
+  "Mongoose Database Module": {
     "prefix": "n-mongo",
     "body": [
-      "import { Module } from '@nestjs/common';",
-      "import { ConfigModule, ConfigService } from '@nestjs/config';",
-      "import { MongooseModule } from '@nestjs/mongoose';",
-      "",
-      "@Module({",
-      "  imports: [",
-      "    MongooseModule.forRootAsync({",
-      "      imports: [ConfigModule],",
-      "      inject: [ConfigService],",
-      "      useFactory: (configService: ConfigService) => ({",
-      "        uri: configService.get('MONGO_URI'),",
-      "      }),",
-      "    }),",
-      "  ],",
-      "  exports: [MongooseModule],",
-      "})",
-      "export class ${1:DatabaseModule} {}",
-      ""
+      "MongooseModule.forRootAsync({",
+      "  imports: [ConfigModule],",
+      "  inject: [ConfigService],",
+      "  useFactory: (configService: ConfigService) => ({",
+      "    uri: configService.get('MONGO_URI'),",
+      "  }),",
+      "}),",
     ],
     "description": "Add @nestjs/mongoose mongoose @nestjs/config"
   },
@@ -128,7 +106,7 @@
     "description": "Add zod"
   },
 
-  "NestJS Zod ConfigModule": {
+  "Zod ConfigModule": {
     "prefix": "n-zod-config",
     "body": [
       "import { Module } from '@nestjs/common';",
@@ -149,7 +127,7 @@
     "description": "Creates a global NestJS ConfigModule validated with a Zod schema."
   },
 
-  "NestJS .env Template": {
+  ".env Template": {
     "prefix": "n-env",
     "body": [
       "NODE_ENV=${1:develop}",
@@ -170,7 +148,7 @@
     "description": "Creates a template .env file for a NestJS application."
   },
 
-  "NestJS JWT Strategy": {
+  "JWT Strategy": {
     "prefix": "n-jwt",
     "body": [
       "import { Injectable } from '@nestjs/common';",
@@ -201,7 +179,7 @@
     "description": "Add @nestjs/jwt passport-jwt"
   },
 
-  "NestJS JWT Module": {
+  "JWT Module": {
     "prefix": "n-jwt-module",
     "body": [
       "import { Module } from '@nestjs/common';",
@@ -229,6 +207,31 @@
       ""
     ],
     "description": "Creates a NestJS module for JWT authentication with Passport."
+  },
+
+  "AWS S3 Provider": {
+    "prefix": "n-s3-provider",
+    "body": [
+      "import { Provider } from '@nestjs/common';",
+      "import { S3Client } from '@aws-sdk/client-s3';",
+      "import { ConfigService } from '@nestjs/config';",
+      "",
+      "export const ${1:S3Provider}: Provider = {",
+      "  provide: '${2:S3_CLIENT}',",
+      "  inject: [ConfigService],",
+      "  useFactory: (configService: ConfigService) => {",
+      "    return new S3Client({",
+      "      region: configService.get<string>('AWS_REGION'),",
+      "      credentials: {",
+      "        accessKeyId: configService.get<string>('AWS_ACCESS_KEY_ID') || '',",
+      "        secretAccessKey:",
+      "          configService.get<string>('AWS_SECRET_ACCESS_KEY') || '',",
+      "      },",
+      "    });",
+      "  },",
+      "};"
+    ],
+    "description": "Add @aws-sdk/client-s3"
   },
 
   "Winston Custom Logger": {
